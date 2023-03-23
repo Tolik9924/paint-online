@@ -12,6 +12,12 @@ import '../styles/toolbar.scss';
 import canvasState from '../store/canvasState';
 
 const ToolBar = () => {
+
+    const changeColor = e => {
+        toolState.setStrokeColor(e.target.value);
+        toolState.setFillColor(e.target.value);
+    };
+
     return (
         <div className='toolbar'>
             <div className='paint-tools'>
@@ -35,11 +41,21 @@ const ToolBar = () => {
                     className='toolbar__btn rect'
                     onClick={() => toolState.setTool(new Rect(canvasState.canvas))}  
                 />
-                <input className='color' type='color' />
+                <input 
+                    className='color' 
+                    type='color'
+                    onChange={e => changeColor(e)} 
+                />
             </div>
             <div className='save-painting'>
-                <button className='toolbar__btn undo' />
-                <button className='toolbar__btn redo' />
+                <button 
+                    className='toolbar__btn undo'
+                    onClick={() => canvasState.undo()} 
+                />
+                <button 
+                    className='toolbar__btn redo'
+                    onClick={() => canvasState.redo()} 
+                />
                 <button className='toolbar__btn save' />
             </div>
         </div>

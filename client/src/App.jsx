@@ -1,4 +1,5 @@
 import React from 'react';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 
 // components
 import Canvas from './components/Canvas';
@@ -9,13 +10,19 @@ import ToolBar from './components/ToolBar';
 import './styles/app.scss';
 
 const App = () => {
-  return (
-    <div className="App">
-      <ToolBar />
-      <SettingBar />
-      <Canvas />
-    </div>
-  );
+    return (
+        <BrowserRouter>
+                <Routes>
+                    <Route path='/:id' element={
+                        <div className="App">
+                            <ToolBar />
+                            <SettingBar />
+                            <Canvas />
+                        </div>
+                    } />
+                </Routes>
+        </BrowserRouter >
+    );
 }
 
 export default App;
