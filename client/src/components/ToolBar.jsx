@@ -18,20 +18,30 @@ const ToolBar = () => {
         toolState.setFillColor(e.target.value);
     };
 
+    const download = () => {
+        const dataUrl = canvasState.canvas.toDataURL();
+        const a = document.createElement('a');
+        a.href = dataUrl;
+        a.download = canvasState.sessionId + '.jpg';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
     return (
         <div className='toolbar'>
             <div className='paint-tools'>
                 <button 
                     className='toolbar__btn brush' 
-                    onClick={() => toolState.setTool(new Brush(canvasState.canvas))} 
+                    onClick={() => toolState.setTool(new Brush(canvasState.canvas, false, canvasState.socket, canvasState.sessionId))} 
                 />
                 <button 
                     className='toolbar__btn circle'
-                    onClick={() => toolState.setTool(new Circle(canvasState.canvas))} 
+                    onClick={() => toolState.setTool(new Circle(canvasState.canvas, canvasState.socket, canvasState.sessionId))} 
                 />
                 <button 
                     className='toolbar__btn eraser'
-                    onClick={() => toolState.setTool(new Brush(canvasState.canvas, true))} 
+                    onClick={() => toolState.setTool(new Brush(canvasState.canvas, true, canvasState.socket, canvasState.sessionId))} 
                 />
                 <button 
                     className='toolbar__btn line'
@@ -39,7 +49,7 @@ const ToolBar = () => {
                 />
                 <button 
                     className='toolbar__btn rect'
-                    onClick={() => toolState.setTool(new Rect(canvasState.canvas))}  
+                    onClick={() => toolState.setTool(new Rect(canvasState.canvas, canvasState.socket, canvasState.sessionId))}  
                 />
                 <input 
                     className='color' 
@@ -56,7 +66,7 @@ const ToolBar = () => {
                     className='toolbar__btn redo'
                     onClick={() => canvasState.redo()} 
                 />
-                <button className='toolbar__btn save' />
+                <button className='toolbar__btn save' onClick={() => download()}/>
             </div>
         </div>
     );

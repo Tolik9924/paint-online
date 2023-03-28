@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 // components
 import Button from 'react-bootstrap/Button';
@@ -9,6 +10,8 @@ import Modal from 'react-bootstrap/Modal';
 
 // class
 import Brush from '../tools/Brush';
+import Rect from '../tools/Rect';
+import Circle from '../tools/Circle';
 
 // store
 import canvasState from '../store/canvasState';
@@ -26,28 +29,75 @@ const Canvas = observer(() => {
 
     useEffect(() => {
         canvasState.setCanvas(canvasRef.current);
-        toolState.setTool(new Brush(canvasRef.current));
+        let ctx = canvasRef.current.getContext('2d');
+        axios.get(`http://localhost:5000/image?id=${params.id}`)
+            .then(response => {
+                const img = new Image();
+                img.src = response.data;
+                img.onload = () => {
+                    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                    ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height);
+                };
+            });
     });
 
     useEffect(() => {
         if (canvasState.username) {
             const socket = new WebSocket(`ws://localhost:5000/`);
+            canvasState.setSocket(socket);
+            canvasState.setSessionId(params.id);
+            toolState.setTool(new Brush(canvasRef.current, false, socket, params.id));
             socket.onopen = () => {
-                console.log('Connected');
                 socket.send(JSON.stringify({
                     id: params.id,
                     username: canvasState.username,
                     method: 'connection',
                 }));
             };
-            socket.onmessage = (event) => {
-                console.log('event data', event.data);
+            socket.onmessage = async (event) => {
+                let msg = await JSON.parse(event.data);
+                switch (msg.method) {
+                    case 'connection':
+                        console.log(`user ${msg.username} connected`);
+                        break;
+                    case 'draw':
+                        drawHandler(msg);
+                        break;
+                    default:
+                    console.log('Does not work method.');
+                }
             };
         }
     }, [canvasState.username]);
 
+    const drawHandler = (msg) => {
+        const figure = msg.figure;
+        const ctx = canvasRef.current.getContext('2d');
+        switch (figure.type) {
+            case 'brush':
+                Brush.draw(ctx, figure.x , figure.y, figure.color);
+                break;
+            case 'rect':
+                Rect.staticDraw(ctx, figure.x, figure.y, figure.width, figure.height, figure.color);
+                break;
+            case 'circle':
+                Circle.staticDraw(ctx, figure.x, figure.y, figure.radius, figure.color);
+                break;
+            case 'erase':
+                Brush.draw(ctx, figure.x , figure.y, '#fff');
+                break;
+            case 'finish':
+                ctx.beginPath();
+                break;
+            default:
+                console.log('Does not work tool item.');
+        }
+    };
+
     const mouseDownHandler = () => {
         canvasState.pushToUndo(canvasRef.current.toDataURL());
+        axios.post(`http://localhost:5000/image?id=${params.id}`, {img: canvasRef.current.toDataURL()})
+            .then(response => console.log(response.data));
     };
 
     const connectHandler = () => {
