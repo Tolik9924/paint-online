@@ -22,6 +22,12 @@ app.ws('/', (ws, req) => {
             case 'draw':
                 broadcastConnection(ws, msg);
                 break;
+            case 'undo':
+                broadcastConnection(ws, msg);
+                break;
+            case 'redo':
+                broadcastConnection(ws, msg);
+                break;
         }
     });
 });

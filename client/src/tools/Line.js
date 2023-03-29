@@ -1,8 +1,8 @@
 import Tool from "./Tool";
 
-export default class Rect extends Tool {
-    constructor(canvas) {
-        super(canvas);
+export default class Line extends Tool {
+    constructor(canvas, socket, id) {
+        super(canvas, socket, id);
         this.listen();
     }
 
@@ -14,6 +14,18 @@ export default class Rect extends Tool {
 
     mouseUpHandler(e) {
         this.mouseDown = false;
+        this.socket.send(JSON.stringify({
+            method: 'draw',
+            id: this.id,
+            figure: {
+                type: 'line',
+                startX: this.startX,
+                startY: this.startY,
+                endX: this.endX,
+                endY: this.endY, 
+                color: this.ctx.fillStyle,
+            } 
+        }));
     }
     mouseDownHandler(e) {
         this.mouseDown = true;
@@ -26,9 +38,9 @@ export default class Rect extends Tool {
         if (this.mouseDown) {
             let currentX = e.pageX - e.target.offsetLeft;
             let currentY = e.pageY - e.target.offsetTop;
-            let endX = currentX;
-            let endY = currentY;
-            this.draw(this.startX, this.startY, endX, endY);
+            this.endX = currentX;
+            this.endY = currentY;
+            this.draw(this.startX, this.startY, this.endX, this.endY);
         }
     }
 
@@ -44,5 +56,14 @@ export default class Rect extends Tool {
             this.ctx.fill();
             this.ctx.stroke();
         };
+    }
+
+    static staticDraw(ctx, startX, startY, endX, endY, color) {
+        ctx.strokeStyle = color;
+        ctx.beginPath();
+        ctx.moveTo(startX, startY);
+        ctx.lineTo(endX, endY);
+        ctx.fill();
+        ctx.stroke()
     }
 }

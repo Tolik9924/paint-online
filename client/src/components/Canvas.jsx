@@ -12,6 +12,7 @@ import Modal from 'react-bootstrap/Modal';
 import Brush from '../tools/Brush';
 import Rect from '../tools/Rect';
 import Circle from '../tools/Circle';
+import Line from '../tools/Line';
 
 // store
 import canvasState from '../store/canvasState';
@@ -39,7 +40,7 @@ const Canvas = observer(() => {
                     ctx.drawImage(img, 0, 0, canvasRef.current.width, canvasRef.current.height);
                 };
             });
-    });
+    }, [params.id]);
 
     useEffect(() => {
         if (canvasState.username) {
@@ -63,8 +64,17 @@ const Canvas = observer(() => {
                     case 'draw':
                         drawHandler(msg);
                         break;
+                    case 'undo':
+                        canvasState.setUndoList(msg.undoList);
+                        canvasState.undo();
+                        break;
+                    case 'redo':
+                        canvasState.setRedoList(msg.redoList);
+                        canvasState.redo();
+                        break;
                     default:
-                    console.log('Does not work method.');
+                        console.log('Does not work method.');
+                        break;
                 }
             };
         }
@@ -85,6 +95,9 @@ const Canvas = observer(() => {
                 break;
             case 'erase':
                 Brush.draw(ctx, figure.x , figure.y, '#fff');
+                break;
+            case 'line':
+                Line.staticDraw(ctx, figure.startX, figure.startY, figure.endX, figure.endY, figure.color);
                 break;
             case 'finish':
                 ctx.beginPath();

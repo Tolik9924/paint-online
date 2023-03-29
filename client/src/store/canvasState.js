@@ -28,8 +28,16 @@ class CanvasState {
         this.canvas = canvas;
     }
 
+    setUndoList(data) {
+        this.undoList = data;
+    }
+
     pushToUndo(data) {
         this.undoList.push(data);
+    }
+
+    setRedoList(data) {
+        this.redoList = data;
     }
 
     pushToRedo(data) {
