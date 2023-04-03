@@ -28,6 +28,8 @@ const Canvas = observer(() => {
     const [modal, setModal] = useState(true);
     const params = useParams();
 
+    console.log('toolState tool', toolState.tool);
+
     useEffect(() => {
         canvasState.setCanvas(canvasRef.current);
         let ctx = canvasRef.current.getContext('2d');
@@ -85,13 +87,13 @@ const Canvas = observer(() => {
         const ctx = canvasRef.current.getContext('2d');
         switch (figure.type) {
             case 'brush':
-                Brush.draw(ctx, figure.x , figure.y, figure.color);
+                Brush.draw(ctx, figure.x , figure.y, figure.color, figure.width);
                 break;
             case 'rect':
                 Rect.staticDraw(ctx, figure.x, figure.y, figure.width, figure.height, figure.color);
                 break;
             case 'circle':
-                Circle.staticDraw(ctx, figure.x, figure.y, figure.radius, figure.color);
+                Circle.staticDraw(ctx, figure.x, figure.y, figure.radius, figure.color, figure.width);
                 break;
             case 'erase':
                 Brush.draw(ctx, figure.x , figure.y, '#fff');

@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import { useParams } from 'react-router-dom';
 
 // store
@@ -18,10 +17,6 @@ import { observer } from 'mobx-react-lite';
 
 const ToolBar = observer(() => {
     const params = useParams();
-
-    console.log('canvas', canvasState.canvas);
-    console.log('undoList', canvasState.undoList);
-    console.log('redoList', canvasState.redoList);
 
     const changeColor = e => {
         toolState.setStrokeColor(e.target.value);

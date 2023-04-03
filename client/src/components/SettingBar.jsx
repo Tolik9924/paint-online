@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 // store
@@ -9,12 +9,30 @@ import '../styles/toolbar.scss';
 
 const SettingBar = observer(() => {
 
+    const [lineWidth, setLineWidth] = useState(0);
+
+    useEffect(() => {
+        if (lineWidth > 0) {
+            toolState.setLineWidth(lineWidth);
+        }
+        if (lineWidth !== toolState.lineWidth) {
+            toolState.setLineWidth(lineWidth);
+        }
+    }, [lineWidth]);
+
+    console.log('lineWidth', lineWidth);
+
     return (
         <div className='setting-bar'>
             <label htmlFor='line-width'>Line Width</label>
             <input 
                 style={{margin: '0 10px'}}
-                onChange={e => toolState.setLineWidth(e.target.value)}
+                onChange={e => {
+                    setLineWidth(e.target.value);
+                    toolState.setLineWidth(lineWidth); 
+                }
+            }
+                value={lineWidth}
                 id='line-width' 
                 type="number"
                 defaultValue={1} 
