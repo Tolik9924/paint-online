@@ -28,8 +28,6 @@ const Canvas = observer(() => {
     const [modal, setModal] = useState(true);
     const params = useParams();
 
-    console.log('toolState tool', toolState.tool);
-
     useEffect(() => {
         canvasState.setCanvas(canvasRef.current);
         let ctx = canvasRef.current.getContext('2d');
@@ -64,7 +62,7 @@ const Canvas = observer(() => {
                         console.log(`user ${msg.username} connected`);
                         break;
                     case 'draw':
-                        drawHandler(msg);
+                        await drawHandler(msg);
                         break;
                     case 'undo':
                         canvasState.setUndoList(msg.undoList);
@@ -82,21 +80,26 @@ const Canvas = observer(() => {
         }
     }, [canvasState.username]);
 
-    const drawHandler = (msg) => {
+    console.log('figure', toolState);
+    console.log('strokeStyle canvas', toolState.strokeStyle);
+
+    const drawHandler = async (msg) => {
         const figure = msg.figure;
         const ctx = canvasRef.current.getContext('2d');
+        /* await toolState.setLineWidth(toolState.lineWidth);
+        await toolState.setStrokeColor(toolState.strokeStyle); */
         switch (figure.type) {
             case 'brush':
-                Brush.draw(ctx, figure.x , figure.y, figure.color, figure.width);
+                Brush.draw(ctx, figure.x, figure.y, figure.color, figure.width);
                 break;
             case 'rect':
                 Rect.staticDraw(ctx, figure.x, figure.y, figure.width, figure.height, figure.color);
                 break;
             case 'circle':
-                Circle.staticDraw(ctx, figure.x, figure.y, figure.radius, figure.color, figure.width);
+                Circle.staticDraw(ctx, figure.x, figure.y, figure.radius, figure.color, figure.width, figure.strokeStyle);
                 break;
             case 'erase':
-                Brush.draw(ctx, figure.x , figure.y, '#fff');
+                Brush.draw(ctx, figure.x, figure.y, '#fff');
                 break;
             case 'line':
                 Line.staticDraw(ctx, figure.startX, figure.startY, figure.endX, figure.endY, figure.color);
@@ -111,7 +114,7 @@ const Canvas = observer(() => {
 
     const mouseDownHandler = () => {
         canvasState.pushToUndo(canvasRef.current.toDataURL());
-        axios.post(`http://localhost:5000/image?id=${params.id}`, {img: canvasRef.current.toDataURL()})
+        axios.post(`http://localhost:5000/image?id=${params.id}`, { img: canvasRef.current.toDataURL() })
             .then(response => console.log(response.data));
     };
 
@@ -120,9 +123,11 @@ const Canvas = observer(() => {
         setModal(false);
     };
 
+    console.log('tool state', toolState.tool);
+
     return (
         <div className='canvas'>
-            <Modal show={modal} onHide={() => {}}>
+            <Modal show={modal} onHide={() => { }}>
                 <Modal.Header closeButton>
                     <Modal.Title>Input your name</Modal.Title>
                 </Modal.Header>

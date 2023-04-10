@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { observer } from 'mobx-react-lite';
 
 // store
@@ -7,43 +7,33 @@ import toolState from '../store/toolState';
 // styles
 import '../styles/toolbar.scss';
 
+
 const SettingBar = observer(() => {
-
-    const [lineWidth, setLineWidth] = useState(0);
-
-    useEffect(() => {
-        if (lineWidth > 0) {
-            toolState.setLineWidth(lineWidth);
-        }
-        if (lineWidth !== toolState.lineWidth) {
-            toolState.setLineWidth(lineWidth);
-        }
-    }, [lineWidth]);
-
-    console.log('lineWidth', lineWidth);
 
     return (
         <div className='setting-bar'>
             <label htmlFor='line-width'>Line Width</label>
-            <input 
-                style={{margin: '0 10px'}}
+            <input
+                style={{ margin: '0 10px' }}
                 onChange={e => {
-                    setLineWidth(e.target.value);
-                    toolState.setLineWidth(lineWidth); 
+                    toolState.setLineWidth(e.target.value);
                 }
-            }
-                value={lineWidth}
-                id='line-width' 
+                }
+                value={toolState.lineWidth}
+                id='line-width'
                 type="number"
-                defaultValue={1} 
-                min={1} 
-                max={50} 
+                defaultValue={toolState.lineWidth}
+                min={1}
+                max={50}
             />
             <label htmlFor='stroke-color'>Stroke Color</label>
             <input
+                style={{ margin: '0 10px' }}
                 id="stroke-color"
-                type='color' 
-                onChange={e => toolState.setStrokeColor(e.target.value)} 
+                value={toolState.strokeStyle}
+                defaultValue={toolState.strokeStyle}
+                type='color'
+                onChange={e => toolState.setStrokeStyle(e.target.value)}
             />
         </div>
     );
